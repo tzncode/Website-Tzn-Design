@@ -209,20 +209,31 @@
 </div>
 	<!-- Start of bodyEnd -->
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const form = document.querySelector('form') || document.querySelector('.framer-1pi1jlt');
+    // Usamos delegación de eventos en el document para que el código sea resistente
+    // a la "hidratación" de React (Framer), la cual reconstruye el DOM y elimina
+    // los escuchadores de eventos colocados directamente en el formulario.
+    document.addEventListener('submit', async (e) => {
+      const form = e.target.closest('form') || e.target.closest('.framer-1pi1jlt');
       if (!form) return;
 
-      const messageContainer = document.createElement('div');
-      messageContainer.style.fontFamily = 'Inter, sans-serif';
-      messageContainer.style.fontSize = '14px';
-      messageContainer.style.marginTop = '20px';
-      messageContainer.style.padding = '12px';
-      messageContainer.style.borderRadius = '6px';
-      messageContainer.style.textAlign = 'center';
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Buscar o crear dinámicamente el contenedor de mensajes después de la hidratación
+      let messageContainer = form.querySelector('.custom-submit-message');
+      if (!messageContainer) {
+        messageContainer = document.createElement('div');
+        messageContainer.className = 'custom-submit-message';
+        messageContainer.style.fontFamily = 'Inter, sans-serif';
+        messageContainer.style.fontSize = '14px';
+        messageContainer.style.marginTop = '20px';
+        messageContainer.style.padding = '12px';
+        messageContainer.style.borderRadius = '6px';
+        messageContainer.style.textAlign = 'center';
+        messageContainer.style.transition = 'all 0.3s ease';
+        form.appendChild(messageContainer);
+      }
       messageContainer.style.display = 'none';
-      messageContainer.style.transition = 'all 0.3s ease';
-      form.appendChild(messageContainer);
 
       const showMessage = (text, type) => {
         messageContainer.innerText = text;
@@ -242,86 +253,79 @@
         }
       };
 
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        messageContainer.style.display = 'none';
-
-        // Honeypot check
-        const honeypots = ['website', 'company', 'message', 'subject', 'title', 'description', 'feedback', 'notes', 'details', 'remarks', 'comments'];
-        let isBot = false;
-        honeypots.forEach(fieldName => {
-          const field = form.querySelector(`input[name="${fieldName}"]`);
-          if (field && field.value) {
-            isBot = true;
-          }
-        });
-
-        if (isBot) {
-          console.warn('Honeypot trigger');
-          showMessage('¡Mensaje enviado con éxito! Nos contactaremos pronto.', 'success');
-          form.reset();
-          return;
-        }
-
-        // Obtener campos de entrada
-        const nameInputs = form.querySelectorAll('input[name="Name"]');
-        const firstName = nameInputs[0] ? nameInputs[0].value.trim() : '';
-        const lastName = nameInputs[1] ? nameInputs[1].value.trim() : '';
-        const name = `${firstName} ${lastName}`.trim();
-
-        const emailInput = form.querySelector('input[type="email"]') || form.querySelector('input[name="Email"]');
-        const email = emailInput ? emailInput.value.trim() : '';
-
-        const categorySelect = form.querySelector('select[name="Category"]') || form.querySelector('select');
-        const category = categorySelect ? categorySelect.value : '';
-
-        const messageTextarea = form.querySelector('textarea[name="Message"]') || form.querySelector('textarea');
-        const message = messageTextarea ? messageTextarea.value.trim() : '';
-
-        const submitButton = form.querySelector('button[type="submit"]') || form.querySelector('button');
-        const submitButtonText = submitButton ? submitButton.querySelector('p') || submitButton : null;
-
-        if (!name || !email || !message) {
-          showMessage('Por favor completa todos los campos requeridos (nombre, email y mensaje).', 'error');
-          return;
-        }
-
-        const originalText = submitButtonText ? submitButtonText.innerText : 'Submit';
-        if (submitButtonText) submitButtonText.innerText = 'Enviando...';
-        if (submitButton) submitButton.disabled = true;
-
-        try {
-          const response = await fetch('/api/send-email', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              name,
-              email,
-              subject: category ? `Categoría: ${category}` : 'Consulta de contacto',
-              message
-            })
-          });
-
-          const result = await response.json();
-
-          if (response.ok && result.success) {
-            showMessage('¡Mensaje enviado con éxito! Nos contactaremos pronto.', 'success');
-            form.reset();
-          } else {
-            throw new Error(result.error || 'Ocurrió un error al enviar el correo');
-          }
-        } catch (error) {
-          console.error(error);
-          showMessage('Error al enviar el mensaje. Intenta de nuevo o escríbenos a tescuchamos@tzndesign.com', 'error');
-        } finally {
-          if (submitButtonText) submitButtonText.innerText = originalText;
-          if (submitButton) submitButton.disabled = false;
+      // Honeypot check
+      const honeypots = ['website', 'company', 'message', 'subject', 'title', 'description', 'feedback', 'notes', 'details', 'remarks', 'comments'];
+      let isBot = false;
+      honeypots.forEach(fieldName => {
+        const field = form.querySelector(`input[name="${fieldName}"]`);
+        if (field && field.value) {
+          isBot = true;
         }
       });
+
+      if (isBot) {
+        console.warn('Honeypot trigger');
+        showMessage('¡Mensaje enviado con éxito! Nos contactaremos pronto.', 'success');
+        form.reset();
+        return;
+      }
+
+      // Obtener campos de entrada
+      const nameInputs = form.querySelectorAll('input[name="Name"]');
+      const firstName = nameInputs[0] ? nameInputs[0].value.trim() : '';
+      const lastName = nameInputs[1] ? nameInputs[1].value.trim() : '';
+      const name = `${firstName} ${lastName}`.trim();
+
+      const emailInput = form.querySelector('input[type="email"]') || form.querySelector('input[name="Email"]');
+      const email = emailInput ? emailInput.value.trim() : '';
+
+      const categorySelect = form.querySelector('select[name="Category"]') || form.querySelector('select');
+      const category = categorySelect ? categorySelect.value : '';
+
+      const messageTextarea = form.querySelector('textarea[name="Message"]') || form.querySelector('textarea');
+      const message = messageTextarea ? messageTextarea.value.trim() : '';
+
+      const submitButton = form.querySelector('button[type="submit"]') || form.querySelector('button');
+      const submitButtonText = submitButton ? submitButton.querySelector('p') || submitButton : null;
+
+      if (!name || !email || !message) {
+        showMessage('Por favor completa todos los campos requeridos (nombre, email y mensaje).', 'error');
+        return;
+      }
+
+      const originalText = submitButtonText ? submitButtonText.innerText : 'Submit';
+      if (submitButtonText) submitButtonText.innerText = 'Enviando...';
+      if (submitButton) submitButton.disabled = true;
+
+      try {
+        const response = await fetch('/api/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            subject: category ? `Categoría: ${category}` : 'Consulta de contacto',
+            message
+          })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          showMessage('¡Mensaje enviado con éxito! Nos contactaremos pronto.', 'success');
+          form.reset();
+        } else {
+          throw new Error(result.error || 'Ocurrió un error al enviar el correo');
+        }
+      } catch (error) {
+        console.error(error);
+        showMessage('Error al enviar el mensaje. Intenta de nuevo o escríbenos a tescuchamos@tzndesign.com', 'error');
+      } finally {
+        if (submitButtonText) submitButtonText.innerText = originalText;
+        if (submitButton) submitButton.disabled = false;
+      }
     });
     </script>
     <!-- End of bodyEnd -->
