@@ -1,0 +1,12 @@
+{
+  "name": "tzn-design-website",
+  "version": "1.0.0",
+  "description": "Sitio web de Tzn Design Studio con funciones serverless",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx -y serve ."
+  },
+  "dependencies": {
+    "nodemailer": "^6.9.13"
+  }
+}
