@@ -215,9 +215,26 @@
     // de Framer se rompieran y reiniciaran el botón.
     const style = document.createElement('style');
     style.innerHTML = `
+      /* Estilo base y transiciones del botón */
+      form button.framer-f9rvbl {
+        background-color: var(--token-fe5ad1ec-ee6b-4f04-b32a-991de61143dc, rgba(255, 255, 255, 0.16)) !important;
+        transition: background-color 0.25s ease, transform 0.2s ease, border-color 0.25s ease !important;
+      }
+      
+      /* Hover y Active nativos para evitar parpadeos con Framer Motion */
+      form button.framer-f9rvbl:not([data-status]):hover {
+        background-color: rgba(255, 255, 255, 0.25) !important;
+        transform: scale(1.02) !important;
+      }
+      form button.framer-f9rvbl:not([data-status]):active {
+        background-color: rgba(255, 255, 255, 0.20) !important;
+        transform: scale(0.98) !important;
+      }
+
       form button[data-status] {
         position: relative !important;
-        transition: all 0.3s ease !important;
+        cursor: default !important;
+        transform: none !important;
       }
       form button[data-status] p {
         opacity: 0 !important;
@@ -258,6 +275,9 @@
     `;
     document.head.appendChild(style);
 
+    // Escuchamos el submit en la fase de captura (capture: true) para interceptar
+    // la llamada ANTES de que el enrutador/manejador de React/Framer intercepte el evento
+    // y llame a stopPropagation() en el contenedor #main.
     document.addEventListener('submit', async (e) => {
       const form = e.target.closest('form') || e.target.closest('.framer-1pi1jlt');
       if (!form) return;
@@ -281,19 +301,19 @@
         return;
       }
 
-      // Obtener campos de entrada
-      const nameInputs = form.querySelectorAll('input[name="Name"]');
+      // Obtener campos de entrada de forma resiliente ante cualquier cambio de casing
+      const nameInputs = form.querySelectorAll('input[name="Name"]') || form.querySelectorAll('input[name="name"]');
       const firstName = nameInputs[0] ? nameInputs[0].value.trim() : '';
       const lastName = nameInputs[1] ? nameInputs[1].value.trim() : '';
       const name = `${firstName} ${lastName}`.trim();
 
-      const emailInput = form.querySelector('input[type="email"]') || form.querySelector('input[name="Email"]');
+      const emailInput = form.querySelector('input[type="email"]') || form.querySelector('input[name="Email"]') || form.querySelector('input[name="email"]');
       const email = emailInput ? emailInput.value.trim() : '';
 
-      const categorySelect = form.querySelector('select[name="Category"]') || form.querySelector('select');
+      const categorySelect = form.querySelector('select[name="Category"]') || form.querySelector('select[name="category"]') || form.querySelector('select');
       const category = categorySelect ? categorySelect.value : '';
 
-      const messageTextarea = form.querySelector('textarea[name="Message"]') || form.querySelector('textarea');
+      const messageTextarea = form.querySelector('textarea[name="Message"]') || form.querySelector('textarea[name="message"]') || form.querySelector('textarea');
       const message = messageTextarea ? messageTextarea.value.trim() : '';
 
       const submitButton = form.querySelector('button[type="submit"]') || form.querySelector('button');
@@ -353,7 +373,7 @@
           }
         }, 4000);
       }
-    });
+    }, { capture: true });
     </script>
     <!-- End of bodyEnd -->
 
