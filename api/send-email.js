@@ -52,7 +52,7 @@ module.exports = async (req, res) => {
         <h2 style="border-bottom: 2px solid #ed6c46; padding-bottom: 10px; color: #ed6c46;">Nuevo Mensaje de Contacto</h2>
         <p><strong>Nombre:</strong> ${name}</p>
         <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
-        <p><strong>Asunto:</strong> ${subject || 'Sin asuntoSpecified'}</p>
+        <p><strong>Asunto:</strong> ${subject || 'Sin asunto especificado'}</p>
         <div style="background-color: #f7f7f7; padding: 15px; border-radius: 5px; margin-top: 15px;">
           <p style="margin: 0; white-space: pre-wrap; line-height: 1.6;">${message}</p>
         </div>
