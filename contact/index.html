@@ -4911,9 +4911,7 @@
       // =======================================================================
       // 1. INYECTAR ESTILOS GLOBALES
       // =======================================================================
-      // Usamos un overlay transparente sobre el botón para capturar hover/click
-      // sin que Framer Motion pueda interferir. El overlay vive fuera del
-      // componente React del botón, así que la hidratación no lo afecta.
+      // Conservamos solo los estilos para las notificaciones toast y errores de validación.
       const style = document.createElement('style');
       style.textContent = `
         /* ── Toast Notification ── */
@@ -5019,103 +5017,6 @@
           border-radius: 0 0 12px 12px;
           background: rgba(255,255,255,0.35);
           transition: width linear;
-        }
-
-        /* ── Botón Submit: overlay approach ── */
-        /* Forzar que el botón real NO tenga pointer-events — los capturamos
-           con un div overlay hermano que vive fuera del DOM de React */
-        .framer-1bhzcsz-container {
-          position: relative !important;
-        }
-        .tzn-btn-overlay {
-          position: absolute !important;
-          inset: 0 !important;
-          z-index: 10 !important;
-          cursor: pointer !important;
-          border-radius: 9px !important;
-          background: transparent !important;
-          transition: background-color 0.25s ease, transform 0.2s ease !important;
-        }
-        .tzn-btn-overlay:hover {
-          background: rgba(255, 255, 255, 0.12) !important;
-          transform: scale(1.02) !important;
-        }
-        .tzn-btn-overlay:active {
-          background: rgba(255, 255, 255, 0.06) !important;
-          transform: scale(0.98) !important;
-        }
-        .tzn-btn-overlay[data-sending] {
-          pointer-events: none !important;
-          cursor: default !important;
-          transform: none !important;
-          background: transparent !important;
-        }
-
-        /* ── Estado visual del botón real ── */
-        form button.framer-f9rvbl,
-        .framer-1bhzcsz-container button.framer-f9rvbl {
-          transition: background-color 0.3s ease, border-color 0.3s ease !important;
-        }
-        .framer-1bhzcsz-container[data-status="sending"] button.framer-f9rvbl {
-          background-color: rgba(255, 255, 255, 0.10) !important;
-        }
-        .framer-1bhzcsz-container[data-status="success"] button.framer-f9rvbl {
-          background-color: rgba(76, 175, 80, 0.18) !important;
-          border: 1px solid rgba(76, 175, 80, 0.4) !important;
-        }
-        .framer-1bhzcsz-container[data-status="error"] button.framer-f9rvbl {
-          background-color: rgba(244, 67, 54, 0.18) !important;
-          border: 1px solid rgba(244, 67, 54, 0.4) !important;
-        }
-
-        /* Ocultar texto original del botón cuando hay status */
-        .framer-1bhzcsz-container[data-status] button .framer-19lkoda {
-          opacity: 0 !important;
-          transition: opacity 0.2s ease !important;
-        }
-
-        /* Texto del estado sobre el botón */
-        .tzn-btn-status-text {
-          position: absolute;
-          inset: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-family: 'Inter', sans-serif;
-          font-weight: 500;
-          font-size: 14px;
-          pointer-events: none;
-          z-index: 5;
-          opacity: 0;
-          transition: opacity 0.25s ease;
-        }
-        .framer-1bhzcsz-container[data-status] .tzn-btn-status-text {
-          opacity: 1;
-        }
-        .framer-1bhzcsz-container[data-status="sending"] .tzn-btn-status-text {
-          color: rgba(255, 255, 255, 0.8);
-        }
-        .framer-1bhzcsz-container[data-status="success"] .tzn-btn-status-text {
-          color: #66bb6a;
-        }
-        .framer-1bhzcsz-container[data-status="error"] .tzn-btn-status-text {
-          color: #ef5350;
-        }
-
-        /* Spinner animation para estado enviando */
-        @keyframes tzn-spin {
-          to { transform: rotate(360deg); }
-        }
-        .tzn-spinner {
-          display: inline-block;
-          width: 16px;
-          height: 16px;
-          border: 2px solid rgba(255,255,255,0.2);
-          border-top-color: rgba(255,255,255,0.8);
-          border-radius: 50%;
-          animation: tzn-spin 0.7s linear infinite;
-          margin-right: 8px;
-          vertical-align: middle;
         }
 
         /* Validación inline de campos */
@@ -5241,56 +5142,46 @@
       }
 
       // =======================================================================
-      // 3. SETUP DEL BOTÓN OVERLAY
+      // 3. CAPTURAR CLIC EN EL BOTÓN ORIGINAL DE FRAMER
       // =======================================================================
-      // El overlay es un div absolutamente posicionado sobre el botón de Framer.
-      // Vive como hijo directo del contenedor del botón (fuera del componente React),
-      // así que la hidratación de Framer no lo destruye ni le quita eventos.
-      // El overlay captura hover (CSS puro) y click (JS), disparando el submit.
+      // Enlazamos directamente con el botón existente de Framer para no interferir
+      // con su diseño, hover, o estados nativos de React, pero interceptando
+      // el click en la fase de captura para ejecutar nuestro script de validación/envío.
 
-      let overlayInstalled = false;
-      let statusTextInstalled = false;
+      let buttonHooked = false;
 
-      function installButtonOverlay() {
+      function hookOriginalButton() {
         const btnContainer = document.querySelector('.framer-1bhzcsz-container');
         if (!btnContainer) return;
 
-        // Evitar duplicados
-        if (btnContainer.querySelector('.tzn-btn-overlay')) {
-          overlayInstalled = true;
+        const button = btnContainer.querySelector('button') || 
+                       btnContainer.querySelector('[role="button"]') || 
+                       btnContainer.querySelector('a');
+        if (!button) return;
+
+        if (button.dataset.tznHooked) {
+          buttonHooked = true;
           return;
         }
 
-        const overlay = document.createElement('div');
-        overlay.className = 'tzn-btn-overlay';
-        overlay.setAttribute('role', 'button');
-        overlay.setAttribute('aria-label', 'Enviar formulario');
-        overlay.setAttribute('tabindex', '0');
-
-        overlay.addEventListener('click', function (e) {
+        button.addEventListener('click', function (e) {
           e.preventDefault();
           e.stopPropagation();
+          e.stopImmediatePropagation();
           handleFormSubmit();
-        });
+        }, { capture: true });
 
-        overlay.addEventListener('keydown', function (e) {
+        button.addEventListener('keydown', function (e) {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             e.stopPropagation();
+            e.stopImmediatePropagation();
             handleFormSubmit();
           }
-        });
+        }, { capture: true });
 
-        btnContainer.appendChild(overlay);
-        overlayInstalled = true;
-
-        // Instalar el texto de estado (también fuera del componente React)
-        if (!btnContainer.querySelector('.tzn-btn-status-text')) {
-          const statusText = document.createElement('div');
-          statusText.className = 'tzn-btn-status-text';
-          btnContainer.appendChild(statusText);
-          statusTextInstalled = true;
-        }
+        button.dataset.tznHooked = 'true';
+        buttonHooked = true;
       }
 
       // =======================================================================
@@ -5302,11 +5193,13 @@
         return document.querySelector('form.framer-1pi1jlt') || document.querySelector('form');
       }
 
+      // Limpiar errores inline
       function clearFieldErrors(form) {
         form.querySelectorAll('.tzn-field-error').forEach(el => el.classList.remove('tzn-field-error'));
         form.querySelectorAll('.tzn-field-error-msg').forEach(el => el.remove());
       }
 
+      // Mostrar error inline abajo del campo
       function showFieldError(input, msg) {
         if (!input) return;
         input.classList.add('tzn-field-error');
@@ -5317,30 +5210,6 @@
         errorEl.textContent = msg;
         input.parentNode.appendChild(errorEl);
         requestAnimationFrame(() => errorEl.classList.add('visible'));
-      }
-
-      function setButtonStatus(status, text) {
-        const btnContainer = document.querySelector('.framer-1bhzcsz-container');
-        const overlay = btnContainer?.querySelector('.tzn-btn-overlay');
-        const statusTextEl = btnContainer?.querySelector('.tzn-btn-status-text');
-
-        if (!btnContainer) return;
-
-        if (status) {
-          btnContainer.setAttribute('data-status', status);
-          if (overlay) overlay.setAttribute('data-sending', '');
-          if (statusTextEl) {
-            if (status === 'sending') {
-              statusTextEl.innerHTML = '<span class="tzn-spinner"></span>' + text;
-            } else {
-              statusTextEl.textContent = text;
-            }
-          }
-        } else {
-          btnContainer.removeAttribute('data-status');
-          if (overlay) overlay.removeAttribute('data-sending');
-          if (statusTextEl) statusTextEl.textContent = '';
-        }
       }
 
       async function handleFormSubmit() {
@@ -5421,7 +5290,13 @@
 
         // Iniciar envío
         isSubmitting = true;
-        setButtonStatus('sending', 'Enviando...');
+        
+        showToast({
+          type: 'info',
+          title: 'Enviando mensaje...',
+          message: 'Estamos procesando tu solicitud, por favor espera.',
+          duration: 3000
+        });
 
         try {
           const response = await fetch('/api/send-email', {
@@ -5443,7 +5318,6 @@
           }
 
           if (response.ok && (result.success || response.status === 200)) {
-            setButtonStatus('success', '¡Mensaje enviado!');
             form.reset();
             // Limpiar clases de "input empty" para Framer
             form.querySelectorAll('.framer-form-input').forEach(input => {
@@ -5461,7 +5335,6 @@
           }
         } catch (error) {
           console.error('[TZN] Error enviando formulario:', error);
-          setButtonStatus('error', 'Error al enviar');
 
           showToast({
             type: 'error',
@@ -5470,11 +5343,7 @@
             duration: 7000
           });
         } finally {
-          // Restaurar botón tras 4 segundos
-          setTimeout(() => {
-            setButtonStatus(null);
-            isSubmitting = false;
-          }, 4000);
+          isSubmitting = false;
         }
       }
 
@@ -5492,14 +5361,14 @@
       }, { capture: true });
 
       // =======================================================================
-      // 6. INSTALAR OVERLAY Y OBSERVAR CAMBIOS DEL DOM
+      // 6. OBSERVAR CAMBIOS DEL DOM PARA ENLAZAR EL BOTÓN
       // =======================================================================
       // Framer hidrata el DOM después de la carga, reconstruyendo los elementos.
-      // Usamos MutationObserver para reinstalar nuestro overlay cada vez que
-      // Framer modifica el contenedor del botón.
+      // Usamos MutationObserver para re-enlazar nuestro click listener en el botón original
+      // si Framer vuelve a reconstruir el DOM.
 
       function tryInstall() {
-        installButtonOverlay();
+        hookOriginalButton();
       }
 
       // Intento inicial
@@ -5514,13 +5383,18 @@
       setTimeout(tryInstall, 1500);
       setTimeout(tryInstall, 3000);
 
-      // Observer para reinstalar si Framer reconstruye el DOM del botón
+      // Observer para re-enlazar el click si Framer reconstruye el DOM del botón
       const observer = new MutationObserver(function (mutations) {
         for (const mutation of mutations) {
           if (mutation.type === 'childList') {
             const container = document.querySelector('.framer-1bhzcsz-container');
-            if (container && !container.querySelector('.tzn-btn-overlay')) {
-              installButtonOverlay();
+            if (container) {
+              const button = container.querySelector('button') || 
+                             container.querySelector('[role="button"]') || 
+                             container.querySelector('a');
+              if (button && !button.dataset.tznHooked) {
+                hookOriginalButton();
+              }
             }
           }
         }
