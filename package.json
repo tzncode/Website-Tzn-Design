@@ -4,7 +4,7 @@
   "description": "Sitio web de Tzn Design Studio con funciones serverless",
   "main": "index.html",
   "scripts": {
-    "dev": "npx -y serve ."
+    "dev": "node scripts/dev-server.js"
   },
   "dependencies": {
     "nodemailer": "^6.9.13"
