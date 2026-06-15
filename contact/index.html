@@ -4440,32 +4440,32 @@
                       </div>
                     </button></div>
                 </div><input type="text" name="website" tabindex="-1" autocomplete="one-time-code" aria-hidden="true"
-                  style="position:absolute;transform:scale(0)" data-1p-ignore="true" data-lpignore="true"
+                  style="position:absolute;transform:scale(0);width:0;height:0;opacity:0;pointer-events:none;z-index:-1" data-1p-ignore="true" data-lpignore="true"
                   data-form-type="other" data-bwignore="true" value=""><input type="text" name="company" tabindex="-1"
-                  autocomplete="one-time-code" aria-hidden="true" style="position:absolute;transform:scale(0)"
+                  autocomplete="one-time-code" aria-hidden="true" style="position:absolute;transform:scale(0);width:0;height:0;opacity:0;pointer-events:none;z-index:-1"
                   data-1p-ignore="true" data-lpignore="true" data-form-type="other" data-bwignore="true" value=""><input
                   type="text" name="message" tabindex="-1" autocomplete="one-time-code" aria-hidden="true"
-                  style="position:absolute;transform:scale(0)" data-1p-ignore="true" data-lpignore="true"
+                  style="position:absolute;transform:scale(0);width:0;height:0;opacity:0;pointer-events:none;z-index:-1" data-1p-ignore="true" data-lpignore="true"
                   data-form-type="other" data-bwignore="true" value=""><input type="text" name="subject" tabindex="-1"
-                  autocomplete="one-time-code" aria-hidden="true" style="position:absolute;transform:scale(0)"
+                  autocomplete="one-time-code" aria-hidden="true" style="position:absolute;transform:scale(0);width:0;height:0;opacity:0;pointer-events:none;z-index:-1"
                   data-1p-ignore="true" data-lpignore="true" data-form-type="other" data-bwignore="true" value=""><input
                   type="text" name="title" tabindex="-1" autocomplete="one-time-code" aria-hidden="true"
-                  style="position:absolute;transform:scale(0)" data-1p-ignore="true" data-lpignore="true"
+                  style="position:absolute;transform:scale(0);width:0;height:0;opacity:0;pointer-events:none;z-index:-1" data-1p-ignore="true" data-lpignore="true"
                   data-form-type="other" data-bwignore="true" value=""><input type="text" name="description"
                   tabindex="-1" autocomplete="one-time-code" aria-hidden="true"
-                  style="position:absolute;transform:scale(0)" data-1p-ignore="true" data-lpignore="true"
+                  style="position:absolute;transform:scale(0);width:0;height:0;opacity:0;pointer-events:none;z-index:-1" data-1p-ignore="true" data-lpignore="true"
                   data-form-type="other" data-bwignore="true" value=""><input type="text" name="feedback" tabindex="-1"
-                  autocomplete="one-time-code" aria-hidden="true" style="position:absolute;transform:scale(0)"
+                  autocomplete="one-time-code" aria-hidden="true" style="position:absolute;transform:scale(0);width:0;height:0;opacity:0;pointer-events:none;z-index:-1"
                   data-1p-ignore="true" data-lpignore="true" data-form-type="other" data-bwignore="true" value=""><input
                   type="text" name="notes" tabindex="-1" autocomplete="one-time-code" aria-hidden="true"
-                  style="position:absolute;transform:scale(0)" data-1p-ignore="true" data-lpignore="true"
+                  style="position:absolute;transform:scale(0);width:0;height:0;opacity:0;pointer-events:none;z-index:-1" data-1p-ignore="true" data-lpignore="true"
                   data-form-type="other" data-bwignore="true" value=""><input type="text" name="details" tabindex="-1"
-                  autocomplete="one-time-code" aria-hidden="true" style="position:absolute;transform:scale(0)"
+                  autocomplete="one-time-code" aria-hidden="true" style="position:absolute;transform:scale(0);width:0;height:0;opacity:0;pointer-events:none;z-index:-1"
                   data-1p-ignore="true" data-lpignore="true" data-form-type="other" data-bwignore="true" value=""><input
                   type="text" name="remarks" tabindex="-1" autocomplete="one-time-code" aria-hidden="true"
-                  style="position:absolute;transform:scale(0)" data-1p-ignore="true" data-lpignore="true"
+                  style="position:absolute;transform:scale(0);width:0;height:0;opacity:0;pointer-events:none;z-index:-1" data-1p-ignore="true" data-lpignore="true"
                   data-form-type="other" data-bwignore="true" value=""><input type="text" name="comments" tabindex="-1"
-                  autocomplete="one-time-code" aria-hidden="true" style="position:absolute;transform:scale(0)"
+                  autocomplete="one-time-code" aria-hidden="true" style="position:absolute;transform:scale(0);width:0;height:0;opacity:0;pointer-events:none;z-index:-1"
                   data-1p-ignore="true" data-lpignore="true" data-form-type="other" data-bwignore="true" value="">
               </form>
             </div>
@@ -5058,6 +5058,23 @@
           .tzn-toast.tzn-toast--leaving {
             transform: translateY(40px);
           }
+        }
+
+        /* ── Submit Button Hover & Active States ── */
+        .framer-1bhzcsz-container button[type="submit"] {
+          transition: background-color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease !important;
+          cursor: pointer !important;
+        }
+        .framer-1bhzcsz-container button[type="submit"]:hover {
+          background-color: var(--token-85b2b5a4-472a-4e83-a15d-c194cb228712, #ed6c46) !important;
+          transform: scale(1.02);
+          box-shadow: 0 4px 15px rgba(237, 108, 70, 0.3);
+        }
+        .framer-1bhzcsz-container button[type="submit"]:hover .framer-19lkoda p {
+          color: #fff !important;
+        }
+        .framer-1bhzcsz-container button[type="submit"]:active {
+          transform: scale(0.98);
         }
       `;
       document.head.appendChild(style);
