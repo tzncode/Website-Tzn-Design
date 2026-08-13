@@ -91,9 +91,15 @@ const server = http.createServer((req, res) => {
   if (resolved) {
     serveFile(resolved, res);
   } else {
-    res.statusCode = 404;
-    res.setHeader('Content-Type', 'text/plain');
-    res.end('404 Not Found');
+    const notFoundHtml = path.join(STATIC_DIR, '404.html');
+    if (fs.existsSync(notFoundHtml) && !path.extname(url.pathname)) {
+      res.statusCode = 404;
+      serveFile(notFoundHtml, res);
+    } else {
+      res.statusCode = 404;
+      res.setHeader('Content-Type', 'text/plain');
+      res.end('404 Not Found');
+    }
   }
 });
 

@@ -41,6 +41,13 @@
         box-shadow: none !important;
       }
 
+      /* Hide any external framer Live Preview button */
+      .framer-1i9bc6d-container {
+        display: none !important;
+        pointer-events: none !important;
+        visibility: hidden !important;
+      }
+
       /* Field Error Styles */
       .tzn-field-error {
         border-bottom-color: #ff4d4f !important;
