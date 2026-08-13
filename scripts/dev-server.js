@@ -67,36 +67,34 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // Handle static file serving
-  let filePath = path.join(STATIC_DIR, url.pathname);
-  if (url.pathname.endsWith('/')) {
-    filePath = path.join(filePath, 'index.html');
+  function resolvePath(targetPath) {
+    if (fs.existsSync(targetPath)) {
+      const stats = fs.statSync(targetPath);
+      if (stats.isDirectory()) {
+        const indexPath = path.join(targetPath, 'index.html');
+        if (fs.existsSync(indexPath)) return indexPath;
+      } else if (stats.isFile()) {
+        return targetPath;
+      }
+    }
+    if (!path.extname(targetPath)) {
+      const htmlPath = targetPath + '.html';
+      if (fs.existsSync(htmlPath)) return htmlPath;
+      const dirIndexPath = path.join(targetPath, 'index.html');
+      if (fs.existsSync(dirIndexPath)) return dirIndexPath;
+    }
+    return null;
   }
 
-  // Check if file exists
-  fs.stat(filePath, (err, stats) => {
-    if (err || !stats.isFile()) {
-      // If it doesn't end in .html, try adding .html (clean URLs support)
-      if (!path.extname(filePath)) {
-        filePath += '.html';
-        fs.stat(filePath, (err2, stats2) => {
-          if (!err2 && stats2.isFile()) {
-            serveFile(filePath, res);
-          } else {
-            res.statusCode = 404;
-            res.setHeader('Content-Type', 'text/plain');
-            res.end('404 Not Found');
-          }
-        });
-      } else {
-        res.statusCode = 404;
-        res.setHeader('Content-Type', 'text/plain');
-        res.end('404 Not Found');
-      }
-    } else {
-      serveFile(filePath, res);
-    }
-  });
+  const filePath = path.join(STATIC_DIR, url.pathname);
+  const resolved = resolvePath(filePath);
+  if (resolved) {
+    serveFile(resolved, res);
+  } else {
+    res.statusCode = 404;
+    res.setHeader('Content-Type', 'text/plain');
+    res.end('404 Not Found');
+  }
 });
 
 function serveFile(filePath, res) {
