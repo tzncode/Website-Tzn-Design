@@ -1,39 +1,100 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <!-- Homepage -->
   <url>
-    <loc>https://tzndesign.com</loc>
+    <loc>https://tzndesign.com/</loc>
+    <lastmod>2026-08-19</lastmod>
     <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://tzndesign.com/assets/images/geNOXROKb3o616wbLuA8pYhAEU.jpg</image:loc>
+      <image:title>Tzn Design Studio - Agencia de Branding e Identidad Visual Argentina</image:title>
+    </image:image>
   </url>
+
+  <!-- Portfolio Principal -->
   <url>
     <loc>https://tzndesign.com/work/portfolio</loc>
+    <lastmod>2026-08-19</lastmod>
     <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://tzndesign.com/assets/images/Rf8zWc2T6zVsrABCdIoWtdai428.png</image:loc>
+      <image:title>Portfolio de Branding y Diseño de Marca</image:title>
+    </image:image>
   </url>
-  <url>
-    <loc>https://tzndesign.com/about</loc>
-    <changefreq>weekly</changefreq>
-  </url>
-  <url>
-    <loc>https://tzndesign.com/contact</loc>
-    <changefreq>weekly</changefreq>
-  </url>
+
+  <!-- Casos de Estudio -->
   <url>
     <loc>https://tzndesign.com/work/portfolio/termoli</loc>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://tzndesign.com/assets/images/OpElW50tNmiyijs05Iw2XV4p3xI.png</image:loc>
+      <image:title>Termoli - Identidad de Marca</image:title>
+    </image:image>
   </url>
+
   <url>
     <loc>https://tzndesign.com/work/portfolio/gerysan</loc>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://tzndesign.com/assets/images/4cFuOjMM3cQYmlkxDdJdlirA4.png</image:loc>
+      <image:title>Gerysan - Identidad Visual</image:title>
+    </image:image>
   </url>
+
   <url>
     <loc>https://tzndesign.com/work/portfolio/unsta</loc>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://tzndesign.com/assets/images/IHQY6EQdYYDSARM7GXPlRS14lw.webp</image:loc>
+      <image:title>UNSTA Jubileo - Identidad Visual</image:title>
+    </image:image>
   </url>
+
   <url>
     <loc>https://tzndesign.com/work/portfolio/moomylk</loc>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://tzndesign.com/assets/images/2gmtKVTlbOXDDoRCbOnyyyjDsE.png</image:loc>
+      <image:title>MooMylk - Branding y Packaging</image:title>
+    </image:image>
   </url>
+
   <url>
     <loc>https://tzndesign.com/work/portfolio/bitxly</loc>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://tzndesign.com/assets/images/1xobLU6psn3UPxj9LTln42YQzfM.png</image:loc>
+      <image:title>Bitxly - Identidad Visual Fintech</image:title>
+    </image:image>
   </url>
+
+  <!-- Paginas Institucionales -->
+  <url>
+    <loc>https://tzndesign.com/about</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://tzndesign.com/contact</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
 </urlset>
